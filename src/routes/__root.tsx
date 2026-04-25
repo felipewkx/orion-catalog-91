@@ -30,19 +30,26 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Orion Coldres — Equipamento Tático" },
+      { title: "Orion Coldres" },
       {
         name: "description",
         content:
           "Coldres táticos profissionais. Catálogo Orion Coldres com pagamento via Pix e atendimento direto pelo WhatsApp.",
       },
       { name: "author", content: "Orion Coldres" },
-      { property: "og:title", content: "Orion Coldres — Equipamento Tático" },
+      { property: "og:title", content: "Orion Coldres" },
       {
         property: "og:description",
         content: "Coldres táticos profissionais com pagamento Pix e WhatsApp.",
       },
       { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Orion Coldres" },
+      { name: "description", content: "Coldres em Kydex" },
+      { property: "og:description", content: "Coldres em Kydex" },
+      { name: "twitter:description", content: "Coldres em Kydex" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/EUMRf5dFHjdZ1TUX3aEQwMuwkMR2/social-images/social-1777145239701-659001027_18160285210442682_7558401868116327951_n.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/EUMRf5dFHjdZ1TUX3aEQwMuwkMR2/social-images/social-1777145239701-659001027_18160285210442682_7558401868116327951_n.webp" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
