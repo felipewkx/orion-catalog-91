@@ -268,6 +268,7 @@ function Dashboard({ email, onLogout }: { email: string; onLogout: () => void })
             <h1 className="text-stencil mt-2 text-3xl font-bold text-foreground md:text-4xl">
               Gerenciar produtos
             </h1>
+            <p className="mt-1 text-xs text-muted-foreground">Conectado como {email}</p>
           </div>
           <div className="flex gap-2">
             <button
