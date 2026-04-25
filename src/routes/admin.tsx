@@ -221,7 +221,7 @@ function NotAdminGate({ email, onLogout }: { email: string; onLogout: () => void
 
 type Editing = Partial<Product> & { id?: string };
 
-function Dashboard({ onLogout }: { onLogout: () => void }) {
+function Dashboard({ email, onLogout }: { email: string; onLogout: () => void }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Editing | null>(null);
@@ -241,7 +241,6 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
   }, []);
 
   const handleLogout = () => {
-    sessionStorage.removeItem(SESSION_KEY);
     onLogout();
   };
 
