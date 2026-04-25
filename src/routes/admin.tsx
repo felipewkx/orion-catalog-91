@@ -5,12 +5,9 @@ import type { Product } from "@/lib/cart-context";
 import { formatBRL } from "@/lib/cart-context";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { Lock, Plus, Pencil, Trash2, Upload, X, LogOut, Shield } from "lucide-react";
+import { Mail, Lock, Plus, Pencil, Trash2, Upload, X, LogOut, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-
-const ADMIN_PASSWORD = "coldres1661";
-const SESSION_KEY = "orion-admin-session";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -22,33 +19,73 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
+type AuthState =
+  | { status: "loading" }
+  | { status: "signed_out" }
+  | { status: "not_admin"; email: string }
+  | { status: "admin"; email: string };
+
 function AdminPage() {
-  const [authed, setAuthed] = useState(false);
-  const [checking, setChecking] = useState(true);
+  const [auth, setAuth] = useState<AuthState>({ status: "loading" });
+
+  const evaluateSession = async () => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    if (!session) {
+      setAuth({ status: "signed_out" });
+      return;
+    }
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", session.user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+    if (roleRow) {
+      setAuth({ status: "admin", email: session.user.email ?? "" });
+    } else {
+      setAuth({ status: "not_admin", email: session.user.email ?? "" });
+    }
+  };
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setAuthed(sessionStorage.getItem(SESSION_KEY) === "1");
-    }
-    setChecking(false);
+    const { data: sub } = supabase.auth.onAuthStateChange(() => {
+      evaluateSession();
+    });
+    evaluateSession();
+    return () => sub.subscription.unsubscribe();
   }, []);
 
-  if (checking) return null;
-  if (!authed) return <LoginGate onAuthed={() => setAuthed(true)} />;
-  return <Dashboard onLogout={() => setAuthed(false)} />;
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setAuth({ status: "signed_out" });
+  };
+
+  if (auth.status === "loading") return null;
+  if (auth.status === "admin")
+    return <Dashboard email={auth.email} onLogout={handleLogout} />;
+  if (auth.status === "not_admin")
+    return <NotAdminGate email={auth.email} onLogout={handleLogout} />;
+  return <LoginGate />;
 }
 
-function LoginGate({ onAuthed }: { onAuthed: () => void }) {
+function LoginGate() {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const submit = (e: FormEvent) => {
+  const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem(SESSION_KEY, "1");
-      onAuthed();
-    } else {
-      setError("Senha incorreta.");
+    setSubmitting(true);
+    setError("");
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+    setSubmitting(false);
+    if (signInError) {
+      setError("Credenciais inválidas.");
       setPassword("");
     }
   };
@@ -69,39 +106,68 @@ function LoginGate({ onAuthed }: { onAuthed: () => void }) {
               Painel Restrito
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Digite a senha para gerir o catálogo.
+              Acesse com suas credenciais de administrador.
             </p>
           </div>
 
-          <div className="mt-6 space-y-2">
-            <label
-              htmlFor="pwd"
-              className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
-            >
-              Senha de administrador
-            </label>
-            <div className="relative">
-              <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                id="pwd"
-                type="password"
-                autoFocus
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setError("");
-                }}
-                className="h-11 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm text-foreground focus:border-primary focus:outline-none"
-              />
+          <div className="mt-6 space-y-4">
+            <div className="space-y-2">
+              <label
+                htmlFor="email"
+                className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+              >
+                E-mail
+              </label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setError("");
+                  }}
+                  className="h-11 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm text-foreground focus:border-primary focus:outline-none"
+                />
+              </div>
             </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="pwd"
+                className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+              >
+                Senha
+              </label>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  id="pwd"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setError("");
+                  }}
+                  className="h-11 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm text-foreground focus:border-primary focus:outline-none"
+                />
+              </div>
+            </div>
+
             {error && <p className="text-xs text-destructive">{error}</p>}
           </div>
 
           <button
             type="submit"
-            className="mt-5 h-11 w-full rounded-md bg-gradient-primary text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-glow transition-transform hover:scale-[1.02] active:scale-95"
+            disabled={submitting}
+            className="mt-5 h-11 w-full rounded-md bg-gradient-primary text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-glow transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-60"
           >
-            Entrar
+            {submitting ? "Entrando..." : "Entrar"}
           </button>
 
           <Link
@@ -117,9 +183,45 @@ function LoginGate({ onAuthed }: { onAuthed: () => void }) {
   );
 }
 
+function NotAdminGate({ email, onLogout }: { email: string; onLogout: () => void }) {
+  return (
+    <div className="flex min-h-screen flex-col bg-background">
+      <SiteHeader />
+      <main className="container mx-auto flex flex-1 items-center justify-center px-4 py-12">
+        <div className="w-full max-w-sm rounded-lg border border-border bg-card p-7 text-center shadow-tactical">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-md bg-destructive/20">
+            <Shield className="h-6 w-6 text-destructive" />
+          </div>
+          <h1 className="text-stencil mt-4 text-2xl font-bold text-foreground">
+            Acesso negado
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            A conta <span className="font-semibold text-foreground">{email}</span> não tem
+            permissão de administrador.
+          </p>
+          <button
+            onClick={onLogout}
+            className="mt-5 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-border bg-secondary text-sm font-medium text-secondary-foreground hover:bg-accent"
+          >
+            <LogOut className="h-4 w-4" />
+            Sair
+          </button>
+          <Link
+            to="/"
+            className="mt-3 block text-xs text-muted-foreground hover:text-foreground"
+          >
+            ← Voltar ao site
+          </Link>
+        </div>
+      </main>
+      <SiteFooter />
+    </div>
+  );
+}
+
 type Editing = Partial<Product> & { id?: string };
 
-function Dashboard({ onLogout }: { onLogout: () => void }) {
+function Dashboard({ email, onLogout }: { email: string; onLogout: () => void }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Editing | null>(null);
@@ -139,7 +241,6 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
   }, []);
 
   const handleLogout = () => {
-    sessionStorage.removeItem(SESSION_KEY);
     onLogout();
   };
 
@@ -167,6 +268,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
             <h1 className="text-stencil mt-2 text-3xl font-bold text-foreground md:text-4xl">
               Gerenciar produtos
             </h1>
+            <p className="mt-1 text-xs text-muted-foreground">Conectado como {email}</p>
           </div>
           <div className="flex gap-2">
             <button
