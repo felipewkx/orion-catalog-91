@@ -54,7 +54,7 @@ function Index() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
-              Linha tática 2025
+              LINHA TÁTICA
             </div>
             <h1 className="text-stencil mt-5 text-5xl font-bold text-foreground md:text-7xl">
               Coldres feitos para
@@ -63,8 +63,8 @@ function Index() {
               </span>
             </h1>
             <p className="mt-5 max-w-xl text-base text-muted-foreground md:text-lg">
-              Equipamento profissional em Kydex e nylon balístico. Conforto, retenção e velocidade
-              de saque para uso diário, esportivo e operacional.
+              Equipamento profissional em Kydex. Conforto, retenção e velocidade de saque para uso
+              diário, esportivo e operacional.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <a
@@ -80,8 +80,8 @@ function Index() {
           {/* Trust bar */}
           <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-3">
             {[
-              { icon: ShieldCheck, label: "Garantia vitalícia", desc: "Em todos os modelos" },
-              { icon: Truck, label: "Envio para todo Brasil", desc: "Despacho em 48h" },
+              { icon: ShieldCheck, label: "Qualidade Garantida", desc: "Em todos os modelos" },
+              { icon: Truck, label: "Envio para todo Brasil", desc: "via Correios" },
               { icon: Crosshair, label: "Ajuste profissional", desc: "Retenção customizada" },
             ].map(({ icon: Icon, label, desc }) => (
               <div
