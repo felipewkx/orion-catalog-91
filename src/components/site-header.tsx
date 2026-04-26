@@ -6,10 +6,10 @@ export function SiteHeader() {
   const { count } = useCart();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md bg-[#02084b]">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <Link to="/" className="flex items-center gap-2 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-primary shadow-glow transition-transform group-hover:scale-105">
+          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-gradient-primary shadow-glow transition-transform group-hover:scale-105 bg-[#d2e01a] text-black">
             <Shield className="h-5 w-5 text-primary-foreground" strokeWidth={2.5} />
           </div>
           <div className="flex flex-col leading-none">
