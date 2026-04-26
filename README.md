@@ -1,6 +1,6 @@
 # 🛍️ Catálogo de Loja com Painel Administrativo
 
-Projeto de um sistema completo de catálogo de produtos com painel administrativo, desenvolvido com auxílio de IA utilizando a plataforma Lovable.
+Projeto de um sistema completo de catálogo de produtos com painel administrativo, carrinho, avaliações; desenvolvido com auxílio de IA utilizando a plataforma Lovable.
 
 🔗 **Acesse o site:**
 https://orioncoldres.lovable.app/
@@ -26,7 +26,9 @@ A aplicação oferece uma interface intuitiva para administração do catálogo,
 * ☁️ Persistência de dados em nuvem
 * 📱 Interface responsiva e fácil de usar
 
----
+Bônus: Seção de Avaliações do Cliente, Carrinho de Compras que encaminha direto para o whatsapp do dono da loja;
+
+------
 
 ## 🧠 Objetivo
 
