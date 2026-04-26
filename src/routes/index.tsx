@@ -144,6 +144,8 @@ function Index() {
         )}
       </section>
 
+      <ReviewsSection />
+
       <SiteFooter />
     </div>
   );
