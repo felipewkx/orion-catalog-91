@@ -47,16 +47,16 @@ function Index() {
             height={1024}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent border-[#010127]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         </div>
 
-        <div className="container relative mx-auto px-4 py-20 md:py-28 bg-[#0a0231]">
+        <div className="container relative mx-auto px-4 py-20 md:py-28">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
               LINHA TÁTICA
             </div>
-            <h1 className="text-stencil mt-5 text-5xl font-bold text-foreground md:text-7xl text-[#fbff00]">
+            <h1 className="text-stencil mt-5 text-5xl font-bold text-primary md:text-7xl">
               FEITO À MÃO
               <span className="block bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
                 POR QUEM ENTENDE.
