@@ -5,7 +5,7 @@ import type { Product } from "@/lib/cart-context";
 import { formatBRL } from "@/lib/cart-context";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { Mail, Lock, Plus, Pencil, Trash2, Upload, X, LogOut, Shield } from "lucide-react";
+import { Mail, Lock, Plus, Pencil, Trash2, Upload, X, LogOut, Shield, Star, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
