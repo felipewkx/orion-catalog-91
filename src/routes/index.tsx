@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
+import { ReviewsSection } from "@/components/reviews-section";
 import type { Product } from "@/lib/cart-context";
 import heroImage from "@/assets/hero-tactical.jpg";
 import { Crosshair, Truck, ShieldCheck } from "lucide-react";
@@ -142,6 +143,8 @@ function Index() {
           </div>
         )}
       </section>
+
+      <ReviewsSection />
 
       <SiteFooter />
     </div>
