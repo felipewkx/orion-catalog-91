@@ -29,6 +29,12 @@ export function SiteHeader() {
           >
             Catálogo
           </Link>
+          <a
+            href="/#avaliacoes"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Avaliações
+          </a>
           <Link
             to="/checkout"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
