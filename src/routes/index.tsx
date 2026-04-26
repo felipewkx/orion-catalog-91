@@ -50,7 +50,7 @@ function Index() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
         </div>
 
-        <div className="container relative mx-auto px-4 py-20 md:py-28">
+        <div className="container relative mx-auto px-4 py-20 md:py-28 bg-[#0a0231]">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
