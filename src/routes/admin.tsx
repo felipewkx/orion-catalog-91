@@ -611,3 +611,120 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </div>
   );
 }
+
+type AdminReview = {
+  id: string;
+  full_name: string;
+  email: string;
+  comment: string;
+  rating: number;
+  created_at: string;
+};
+
+function AdminReviews() {
+  const [reviews, setReviews] = useState<AdminReview[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const load = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (!error && data) setReviews(data as unknown as AdminReview[]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const handleDelete = async (r: AdminReview) => {
+    if (!confirm(`Excluir avaliação de "${r.full_name}"? Esta ação não pode ser desfeita.`)) return;
+    const { error } = await supabase.from("reviews").delete().eq("id", r.id);
+    if (error) {
+      toast.error("Erro ao excluir avaliação.");
+      return;
+    }
+    toast.success("Avaliação excluída.");
+    load();
+  };
+
+  return (
+    <section className="mt-14">
+      <div className="mb-6 flex items-end justify-between">
+        <div>
+          <div className="text-[11px] font-bold uppercase tracking-[0.25em] text-primary">
+            Moderação
+          </div>
+          <h2 className="text-stencil mt-2 text-2xl font-bold text-foreground md:text-3xl">
+            Avaliações dos clientes
+          </h2>
+        </div>
+        <div className="hidden text-sm text-muted-foreground sm:block">
+          {reviews.length} {reviews.length === 1 ? "avaliação" : "avaliações"}
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="text-sm text-muted-foreground">Carregando avaliações...</div>
+      ) : reviews.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-card/40 px-6 py-12 text-center">
+          <MessageSquare className="h-10 w-10 text-muted-foreground/40" />
+          <p className="mt-3 text-sm text-muted-foreground">
+            Nenhuma avaliação foi enviada ainda.
+          </p>
+        </div>
+      ) : (
+        <ul className="space-y-3">
+          {reviews.map((r) => (
+            <li
+              key={r.id}
+              className="rounded-lg border border-border bg-card p-5"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-bold text-foreground">{r.full_name}</span>
+                    <span className="text-xs text-muted-foreground">
+                      &lt;{r.email}&gt;
+                    </span>
+                  </div>
+                  <div className="mt-1 flex items-center gap-2">
+                    <div className="flex">
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <Star
+                          key={n}
+                          className={cn(
+                            "h-4 w-4",
+                            n <= r.rating
+                              ? "fill-primary text-primary"
+                              : "text-muted-foreground/40",
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(r.created_at).toLocaleString("pt-BR")}
+                    </span>
+                  </div>
+                  <p className="mt-3 whitespace-pre-wrap text-sm text-foreground/90">
+                    {r.comment}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleDelete(r)}
+                  className="rounded-md border border-border p-2 text-muted-foreground hover:border-destructive hover:text-destructive"
+                  aria-label="Excluir avaliação"
+                  title="Excluir avaliação"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
