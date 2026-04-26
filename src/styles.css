@@ -38,57 +38,57 @@
 :root {
   --radius: 0.5rem;
 
-  /* Tactical dark theme */
-  --background: oklch(0.16 0.005 270);
-  --foreground: oklch(0.96 0.005 270);
+  /* Orion Holsters — dark navy base */
+  --background: oklch(0.18 0.12 270);
+  --foreground: oklch(0.92 0.18 100); /* yellow primary text */
 
-  --card: oklch(0.21 0.008 270);
-  --card-foreground: oklch(0.96 0.005 270);
+  --card: oklch(0.22 0.13 270);
+  --card-foreground: oklch(0.92 0.18 100);
 
-  --popover: oklch(0.21 0.008 270);
-  --popover-foreground: oklch(0.96 0.005 270);
+  --popover: oklch(0.22 0.13 270);
+  --popover-foreground: oklch(0.92 0.18 100);
 
-  /* Tactical orange */
-  --primary: oklch(0.72 0.17 50);
-  --primary-foreground: oklch(0.14 0.005 270);
-  --primary-glow: oklch(0.78 0.18 55);
+  /* Orion yellow */
+  --primary: oklch(0.92 0.18 100);
+  --primary-foreground: oklch(0.18 0.12 270);
+  --primary-glow: oklch(0.96 0.19 100);
 
-  --secondary: oklch(0.27 0.01 270);
-  --secondary-foreground: oklch(0.96 0.005 270);
+  --secondary: oklch(0.28 0.12 270);
+  --secondary-foreground: oklch(1 0 0); /* white secondary text */
 
-  --muted: oklch(0.24 0.008 270);
-  --muted-foreground: oklch(0.65 0.01 270);
+  --muted: oklch(0.25 0.12 270);
+  --muted-foreground: oklch(0.95 0 0); /* white secondary text */
 
-  --accent: oklch(0.27 0.01 270);
-  --accent-foreground: oklch(0.96 0.005 270);
+  --accent: oklch(0.92 0.18 100);
+  --accent-foreground: oklch(0.18 0.12 270);
 
   /* Military green for available status */
   --military: oklch(0.55 0.12 140);
-  --military-foreground: oklch(0.98 0.005 270);
+  --military-foreground: oklch(1 0 0);
 
   --success: oklch(0.65 0.18 145);
-  --success-foreground: oklch(0.14 0.005 270);
+  --success-foreground: oklch(0.18 0.12 270);
 
   --destructive: oklch(0.6 0.22 25);
-  --destructive-foreground: oklch(0.98 0.005 270);
+  --destructive-foreground: oklch(1 0 0);
 
-  --border: oklch(0.28 0.008 270);
-  --input: oklch(0.24 0.008 270);
-  --ring: oklch(0.72 0.17 50);
+  --border: oklch(0.32 0.12 270);
+  --input: oklch(0.25 0.12 270);
+  --ring: oklch(0.92 0.18 100);
 
   /* Gradients */
-  --gradient-hero: linear-gradient(135deg, oklch(0.16 0.005 270) 0%, oklch(0.21 0.008 270) 100%);
+  --gradient-hero: linear-gradient(135deg, oklch(0.16 0.12 270) 0%, oklch(0.22 0.13 270) 100%);
   --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-glow));
   --gradient-overlay: linear-gradient(
     180deg,
-    oklch(0.14 0.005 270 / 0) 0%,
-    oklch(0.14 0.005 270 / 0.95) 100%
+    oklch(0.16 0.12 270 / 0) 0%,
+    oklch(0.16 0.12 270 / 0.95) 100%
   );
 
   /* Shadows */
-  --shadow-tactical: 0 10px 40px -10px oklch(0.72 0.17 50 / 0.3);
+  --shadow-tactical: 0 10px 40px -10px oklch(0.92 0.18 100 / 0.3);
   --shadow-card: 0 4px 20px -4px oklch(0 0 0 / 0.5);
-  --shadow-glow: 0 0 30px oklch(0.72 0.17 50 / 0.4);
+  --shadow-glow: 0 0 30px oklch(0.92 0.18 100 / 0.35);
 
   /* Transitions */
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -96,9 +96,8 @@
 }
 
 .dark {
-  /* Same as root — tactical theme is dark by default */
-  --background: oklch(0.16 0.005 270);
-  --foreground: oklch(0.96 0.005 270);
+  --background: oklch(0.18 0.12 270);
+  --foreground: oklch(0.92 0.18 100);
 }
 
 @layer base {
