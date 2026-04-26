@@ -370,6 +370,8 @@ function Dashboard({ email, onLogout }: { email: string; onLogout: () => void })
             </table>
           </div>
         )}
+
+        <AdminReviews />
       </main>
 
       {editing && (
