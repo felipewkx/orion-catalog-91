@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -7,15 +7,19 @@ import { ProductCard } from "@/components/product-card";
 import { ReviewsSection } from "@/components/reviews-section";
 import type { Product } from "@/lib/cart-context";
 import heroImage from "@/assets/hero-tactical.jpg";
-import { Crosshair, Truck, ShieldCheck } from "lucide-react";
+import { Crosshair, Truck, ShieldCheck, Search, Instagram, Mail, MessageCircle } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
+const INSTAGRAM_URL = "https://www.instagram.com/orioncoldres/";
+const WHATSAPP_URL = "https://wa.me/5567981928456";
+const EMAIL_URL = "mailto:garlipp15@gmail.com";
+
 function Index() {
+  const [query, setQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
@@ -23,15 +27,26 @@ function Index() {
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("name", { ascending: true });
       if (!mounted) return;
       if (!error && data) setProducts(data as unknown as Product[]);
-      setLoading(false);
     })();
     return () => {
       mounted = false;
     };
   }, []);
+
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return [];
+    return products
+      .filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          (p.description ?? "").toLowerCase().includes(q),
+      )
+      .slice(0, 8);
+  }, [products, query]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -68,13 +83,65 @@ function Index() {
               diário, esportivo e operacional.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <a
-                href="#catalogo"
+              <Link
+                to="/catalog"
                 className="inline-flex items-center gap-2 rounded-md bg-gradient-primary px-6 py-3 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-glow transition-transform hover:scale-105"
               >
                 <Crosshair className="h-4 w-4" />
                 Ver catálogo
-              </a>
+              </Link>
+            </div>
+
+            {/* Search */}
+            <div className="mt-8 max-w-xl">
+              <div className="flex items-center gap-2 rounded-md border border-border bg-card/80 px-3 py-2 backdrop-blur-sm">
+                <Search className="h-4 w-4 text-muted-foreground" />
+                <input
+                  type="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Pesquisar produtos..."
+                  className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+                />
+              </div>
+              {query.trim() && (
+                <div className="mt-3 rounded-md border border-border bg-card/90 p-3 backdrop-blur-sm">
+                  {results.length === 0 ? (
+                    <div className="px-2 py-3 text-sm text-muted-foreground">
+                      Nenhum produto encontrado.
+                    </div>
+                  ) : (
+                    <ul className="divide-y divide-border">
+                      {results.map((p) => (
+                        <li key={p.id}>
+                          <Link
+                            to="/catalog"
+                            className="flex items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-accent/50"
+                          >
+                            {p.image_url ? (
+                              <img
+                                src={p.image_url}
+                                alt={p.name}
+                                className="h-10 w-10 rounded object-cover"
+                              />
+                            ) : (
+                              <div className="h-10 w-10 rounded bg-muted" />
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <div className="truncate text-sm font-bold text-foreground">
+                                {p.name}
+                              </div>
+                              <div className="truncate text-xs text-muted-foreground">
+                                {p.description}
+                              </div>
+                            </div>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -102,46 +169,52 @@ function Index() {
         </div>
       </section>
 
-      {/* CATALOG */}
-      <section id="catalogo" className="container mx-auto flex-1 px-4 py-16">
-        <div className="mb-10 flex items-end justify-between">
-          <div>
-            <div className="text-[11px] font-bold uppercase tracking-[0.25em] text-primary">
-              Catálogo
-            </div>
-            <h2 className="text-stencil mt-2 text-3xl font-bold text-foreground md:text-4xl">
-              Modelos disponíveis
-            </h2>
+      {/* CONTACT / SOCIAL */}
+      <section id="contato" className="container mx-auto px-4 py-16">
+        <div className="mb-8 text-center">
+          <div className="text-[11px] font-bold uppercase tracking-[0.25em] text-primary">
+            Fale com a gente
           </div>
-          <div className="hidden text-sm text-muted-foreground sm:block">
-            {products.length} {products.length === 1 ? "produto" : "produtos"}
-          </div>
+          <h2 className="text-stencil mt-2 text-3xl font-bold text-foreground md:text-4xl">
+            Contato direto
+          </h2>
         </div>
-
-        {loading ? (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div
-                key={i}
-                className="aspect-[3/4] animate-pulse rounded-lg border border-border bg-card"
-              />
-            ))}
-          </div>
-        ) : products.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-card/40 px-6 py-20 text-center">
-            <Crosshair className="h-12 w-12 text-muted-foreground/40" />
-            <h3 className="mt-4 text-lg font-bold text-foreground">Catálogo em preparação</h3>
-            <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-              Em breve novos coldres disponíveis. Acompanhe pelo WhatsApp ou retorne mais tarde.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        )}
+        <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex flex-col items-center gap-3 rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/40 hover:shadow-tactical"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary/15 text-primary transition-transform group-hover:scale-110">
+              <Instagram className="h-6 w-6" />
+            </div>
+            <div className="text-sm font-bold text-foreground">Instagram</div>
+            <div className="text-xs text-muted-foreground">@orioncoldres</div>
+          </a>
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex flex-col items-center gap-3 rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/40 hover:shadow-tactical"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary/15 text-primary transition-transform group-hover:scale-110">
+              <MessageCircle className="h-6 w-6" />
+            </div>
+            <div className="text-sm font-bold text-foreground">WhatsApp</div>
+            <div className="text-xs text-muted-foreground">+55 67 98192-8456</div>
+          </a>
+          <a
+            href={EMAIL_URL}
+            className="group flex flex-col items-center gap-3 rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/40 hover:shadow-tactical"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary/15 text-primary transition-transform group-hover:scale-110">
+              <Mail className="h-6 w-6" />
+            </div>
+            <div className="text-sm font-bold text-foreground">E-mail</div>
+            <div className="text-xs text-muted-foreground">garlipp15@gmail.com</div>
+          </a>
+        </div>
       </section>
 
       <ReviewsSection />

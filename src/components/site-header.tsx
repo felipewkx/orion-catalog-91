@@ -27,6 +27,13 @@ export function SiteHeader() {
             activeProps={{ className: "text-foreground" }}
             activeOptions={{ exact: true }}
           >
+            Início
+          </Link>
+          <Link
+            to="/catalog"
+            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            activeProps={{ className: "text-foreground" }}
+          >
             Catálogo
           </Link>
           <a
