@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
-import type { Product } from "@/lib/cart-context";
+import { classifyProduct, type Product } from "@/lib/cart-context";
 import { Crosshair, Search } from "lucide-react";
 
 export const Route = createFileRoute("/catalog")({
