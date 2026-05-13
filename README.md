@@ -84,6 +84,24 @@ Developed by Felipe Walker
 
 ---
 
+##  Latest Updates
+
+###  Advanced Product & Pricing System
+- **Multi-Price Variations:** Admins can now add up to **8 different price points** per product, each with a custom label (e.g., size, material, or plan type).
+- **Non-Commercial Items:** Products set with a price of `0` are automatically categorized as informational. They are pinned to the top of the catalog and have the "Add to Cart" functionality disabled.
+
+###  Integrated Coupon System
+- **Coupon Products:** Introduced the ability to create discount coupons directly in the product catalog using percentage values (e.g., "15%").
+- **Cart Logic:** 
+    - Supports one non-cumulative coupon per checkout.
+    - Automatic calculation of the total discount based on the percentage defined.
+
+###  Checkout & Payment Optimization
+- **Cash Payment Discount:** Added a "Pay in Cash" (*Pagarei à vista*) toggle in the shopping cart that applies an instant **10% discount** to the total order value.
+- **Dynamic Calculation:** The system now handles complex total calculations, including the interplay between product variations, coupons, and payment method incentives.
+
+### Enhanced WhatsApp Integration
+
 ## Note
 
 This project is part of my portfolio and demonstrates the development of a complete web application, integrating frontend, backend, authentication, cloud storage, and administrative functionalities in a real-world usage scenario.
@@ -173,6 +191,27 @@ Desenvolvido por Felipe Walker
 * LinkedIn: https://linkedin.com/in/felipewkx
 
 ---
+
+## Atualizações Recentes
+
+### Sistema Avançado de Produtos e Preços
+- **Variações de Preço Múltiplas:** Os administradores agora podem adicionar até **8 faixas de preço diferentes** por produto, cada uma com uma etiqueta personalizada (por exemplo, tamanho, material ou tipo de plano).
+
+- **Itens Não Comerciais:** Produtos com preço definido como `0` são automaticamente categorizados como informativos. Eles são fixados no topo do catálogo e têm a funcionalidade "Adicionar ao Carrinho" desativada.
+
+### Sistema Integrado de Cupons
+- **Produtos com Cupom:** Introduzimos a possibilidade de criar cupons de desconto diretamente no catálogo de produtos usando valores percentuais (por exemplo, "15%").
+
+**Lógica do Carrinho:**
+- Suporta um cupom não cumulativo por finalização de compra.
+- Cálculo automático do desconto total com base na porcentagem definida.
+
+### Otimização do Checkout e Pagamento
+- **Desconto para Pagamento em Dinheiro:** Adicionamos uma opção "Pagar em Dinheiro" no carrinho de compras que aplica um desconto instantâneo de **10%** no valor total do pedido.
+
+- **Cálculo Dinâmico:** O sistema agora lida com cálculos complexos do total, incluindo a interação entre variações de produtos, cupons e incentivos de métodos de pagamento.
+
+### Integração Aprimorada com o WhatsApp
 
 ## Observação
 
