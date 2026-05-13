@@ -12,6 +12,8 @@ import {
   MessageCircle,
   ShoppingBag,
   AlertTriangle,
+  Tag,
+  Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -30,9 +32,23 @@ export const Route = createFileRoute("/checkout")({
 });
 
 function CheckoutPage() {
-  const { items, updateQty, remove, total, clear } = useCart();
+  const {
+    items,
+    updateQty,
+    remove,
+    subtotal,
+    couponItem,
+    couponDiscountAmount,
+    cashDiscount,
+    setCashDiscount,
+    cashDiscountAmount,
+    total,
+    clear,
+  } = useCart();
   const [copied, setCopied] = useState(false);
   const [name, setName] = useState("");
+
+  const productLines = items.filter((i) => !i.isCoupon);
 
   const copyPix = async () => {
     try {
@@ -52,19 +68,40 @@ function CheckoutPage() {
       `*Cliente:* ${name || "(não informado)"}`,
       ``,
       `*Itens:*`,
-      ...items.map(
-        (i) => `• ${i.quantity}x ${i.name} — ${formatBRL(i.price * i.quantity)}`,
+      ...productLines.map(
+        (i) =>
+          `• ${i.quantity}x ${i.name} — ${i.selectedLabel} — ${formatBRL(
+            i.unitPrice * i.quantity,
+          )}`,
       ),
       ``,
-      `*Total: ${formatBRL(total)}*`,
+      `*Subtotal:* ${formatBRL(subtotal)}`,
+    ];
+
+    if (couponItem) {
+      lines.push(
+        `*Cupom aplicado:* ${couponItem.name} (${couponItem.selectedLabel} — ${couponItem.discountPercent}%)`,
+        `*Desconto cupom:* -${formatBRL(couponDiscountAmount)}`,
+      );
+    }
+
+    lines.push(`*Pagamento à vista (10% off):* ${cashDiscount ? "Sim" : "Não"}`);
+    if (cashDiscount) {
+      lines.push(`*Desconto à vista:* -${formatBRL(cashDiscountAmount)}`);
+    }
+
+    lines.push(
+      ``,
+      `*TOTAL FINAL: ${formatBRL(total)}*`,
       ``,
       `Olá, acabei de fazer este pedido no site e vou enviar o comprovativo do Pix abaixo.`,
-    ];
+    );
+
     return lines.join("\n");
   };
 
   const handleWhatsApp = () => {
-    if (items.length === 0) {
+    if (productLines.length === 0) {
       toast.error("Seu carrinho está vazio.");
       return;
     }
@@ -98,7 +135,7 @@ function CheckoutPage() {
               Adicione coldres ao carrinho para finalizar a compra.
             </p>
             <Link
-              to="/"
+              to="/catalog"
               className="mt-6 inline-flex items-center rounded-md bg-gradient-primary px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-glow"
             >
               Ver catálogo
@@ -108,9 +145,9 @@ function CheckoutPage() {
           <div className="grid gap-8 lg:grid-cols-[1fr_400px]">
             {/* Items */}
             <section className="space-y-3">
-              {items.map((item) => (
+              {productLines.map((item) => (
                 <div
-                  key={item.id}
+                  key={item.lineId}
                   className="flex gap-4 rounded-lg border border-border bg-card p-3 sm:p-4"
                 >
                   <div className="h-20 w-20 shrink-0 overflow-hidden rounded-md bg-muted sm:h-24 sm:w-24">
@@ -126,12 +163,15 @@ function CheckoutPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <h3 className="text-stencil font-bold text-foreground">{item.name}</h3>
-                        <p className="text-xs text-muted-foreground line-clamp-1">
+                        <div className="mt-0.5 inline-flex items-center gap-1 rounded-sm bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary">
+                          {item.selectedLabel}
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
                           {item.description}
                         </p>
                       </div>
                       <button
-                        onClick={() => remove(item.id)}
+                        onClick={() => remove(item.lineId)}
                         className="text-muted-foreground transition-colors hover:text-destructive"
                         aria-label="Remover"
                       >
@@ -141,7 +181,7 @@ function CheckoutPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1 rounded-md border border-border bg-secondary">
                         <button
-                          onClick={() => updateQty(item.id, item.quantity - 1)}
+                          onClick={() => updateQty(item.lineId, item.quantity - 1)}
                           className="flex h-8 w-8 items-center justify-center text-muted-foreground hover:text-foreground"
                           aria-label="Diminuir"
                         >
@@ -149,7 +189,7 @@ function CheckoutPage() {
                         </button>
                         <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
                         <button
-                          onClick={() => updateQty(item.id, item.quantity + 1)}
+                          onClick={() => updateQty(item.lineId, item.quantity + 1)}
                           className="flex h-8 w-8 items-center justify-center text-muted-foreground hover:text-foreground"
                           aria-label="Aumentar"
                         >
@@ -157,12 +197,38 @@ function CheckoutPage() {
                         </button>
                       </div>
                       <div className="font-bold text-primary">
-                        {formatBRL(item.price * item.quantity)}
+                        {formatBRL(item.unitPrice * item.quantity)}
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
+
+              {couponItem && (
+                <div className="flex items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/10 p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/20 text-primary">
+                      <Tag className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-primary">
+                        Cupom aplicado
+                      </div>
+                      <div className="text-sm font-bold text-foreground">
+                        {couponItem.name} — {couponItem.selectedLabel} (
+                        {couponItem.discountPercent}%)
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => remove(couponItem.lineId)}
+                    className="text-muted-foreground transition-colors hover:text-destructive"
+                    aria-label="Remover cupom"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
 
               <button
                 onClick={clear}
@@ -178,14 +244,53 @@ function CheckoutPage() {
                 <h2 className="text-stencil text-lg font-bold text-foreground">Resumo</h2>
                 <div className="mt-4 space-y-2 text-sm">
                   <div className="flex justify-between text-muted-foreground">
-                    <span>Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} itens)</span>
-                    <span>{formatBRL(total)}</span>
+                    <span>
+                      Subtotal ({productLines.reduce((s, i) => s + i.quantity, 0)} itens)
+                    </span>
+                    <span>{formatBRL(subtotal)}</span>
                   </div>
+                  {couponItem && (
+                    <div className="flex justify-between text-primary">
+                      <span>Cupom ({couponItem.discountPercent}%)</span>
+                      <span>-{formatBRL(couponDiscountAmount)}</span>
+                    </div>
+                  )}
+                  {cashDiscount && (
+                    <div className="flex justify-between text-primary">
+                      <span>Desconto à vista (10%)</span>
+                      <span>-{formatBRL(cashDiscountAmount)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between border-t border-border pt-3 text-base">
                     <span className="font-bold text-foreground">Total</span>
                     <span className="text-2xl font-bold text-primary">{formatBRL(total)}</span>
                   </div>
                 </div>
+
+                {/* Cash payment toggle */}
+                <label
+                  htmlFor="cash-toggle"
+                  className="mt-4 flex cursor-pointer items-start gap-3 rounded-md border border-border bg-secondary/40 p-3 transition-colors hover:border-primary/40"
+                >
+                  <input
+                    id="cash-toggle"
+                    type="checkbox"
+                    checked={cashDiscount}
+                    onChange={(e) => setCashDiscount(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 accent-primary"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <Wallet className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-bold text-foreground">
+                        Pagarei à vista
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Aplica 10% de desconto sobre o total final.
+                    </p>
+                  </div>
+                </label>
               </div>
 
               {/* Customer name */}
@@ -245,7 +350,7 @@ function CheckoutPage() {
                 <p className="text-sm leading-relaxed text-foreground">
                   <strong className="text-primary">Importante:</strong> Clique no botão abaixo
                   para enviar o seu pedido completo para a Orion Coldres e anexe o comprovativo
-                  do Pix na conversa para agilizar a sua compra. Para pagamentos parcelados, 
+                  do Pix na conversa para agilizar a sua compra. Para pagamentos parcelados,
                   cartões ou pedidos em grupo, tratar direto no WhatsApp.
                 </p>
               </div>
