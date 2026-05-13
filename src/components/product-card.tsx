@@ -1,16 +1,46 @@
-import { Plus, CheckCircle2 } from "lucide-react";
+import { Plus, CheckCircle2, Info, Tag } from "lucide-react";
 import { useState } from "react";
-import { useCart, formatBRL, type Product } from "@/lib/cart-context";
+import {
+  useCart,
+  formatBRL,
+  getProductOptions,
+  classifyProduct,
+  isPercentValue,
+  parseNumericValue,
+  parsePercent,
+  type Product,
+} from "@/lib/cart-context";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function ProductCard({ product }: { product: Product }) {
   const { add } = useCart();
+  const options = getProductOptions(product);
+  const kind = classifyProduct(product);
+  const [selectedIdx, setSelectedIdx] = useState(0);
   const [added, setAdded] = useState(false);
+
   const isAvailable = product.status === "available";
+  const isInformational = kind === "informational";
+  const isCoupon = kind === "coupon";
+  const canAdd = isAvailable && !isInformational;
+
+  const selected = options[selectedIdx] ?? options[0];
+  const selectedIsPercent = selected ? isPercentValue(selected.value) : false;
+
+  const renderValue = (v: string) => {
+    if (isPercentValue(v)) return `${parsePercent(v)}% OFF`;
+    const n = parseNumericValue(v);
+    return n === 0 ? "Gratuito" : formatBRL(n);
+  };
 
   const handleAdd = () => {
-    if (!isAvailable) return;
-    add(product);
+    if (!canAdd || !selected) return;
+    const result = add({ product, option: selected });
+    if (!result.ok) {
+      toast.error(result.reason ?? "Não foi possível adicionar.");
+      return;
+    }
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
@@ -37,13 +67,29 @@ export function ProductCard({ product }: { product: Product }) {
         <div
           className={cn(
             "absolute left-3 top-3 flex items-center gap-1.5 rounded-sm px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest backdrop-blur-sm",
-            isAvailable
-              ? "bg-military/90 text-military-foreground"
-              : "bg-destructive/90 text-destructive-foreground",
+            !isAvailable
+              ? "bg-destructive/90 text-destructive-foreground"
+              : isInformational
+                ? "bg-primary/90 text-primary-foreground"
+                : isCoupon
+                  ? "bg-accent/90 text-accent-foreground"
+                  : "bg-military/90 text-military-foreground",
           )}
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-current" />
-          {isAvailable ? "Disponível" : "Esgotado"}
+          {isInformational ? (
+            <Info className="h-3 w-3" />
+          ) : isCoupon ? (
+            <Tag className="h-3 w-3" />
+          ) : (
+            <span className="h-1.5 w-1.5 rounded-full bg-current" />
+          )}
+          {!isAvailable
+            ? "Esgotado"
+            : isInformational
+              ? "Informativo"
+              : isCoupon
+                ? "Cupom"
+                : "Disponível"}
         </div>
       </div>
 
@@ -55,27 +101,70 @@ export function ProductCard({ product }: { product: Product }) {
           <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
         </div>
 
+        {options.length > 1 && (
+          <div className="space-y-1.5">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              {isCoupon ? "Cupom" : "Opção"}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {options.map((o, i) => (
+                <button
+                  key={`${o.label}-${i}`}
+                  type="button"
+                  onClick={() => setSelectedIdx(i)}
+                  className={cn(
+                    "rounded-sm border px-2 py-1 text-[11px] font-semibold transition-colors",
+                    i === selectedIdx
+                      ? "border-primary bg-primary/15 text-primary"
+                      : "border-border bg-secondary/40 text-muted-foreground hover:border-primary/40 hover:text-foreground",
+                  )}
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="flex items-end justify-between gap-2 pt-2 border-t border-border">
           <div>
             <div className="text-[10px] uppercase tracking-widest text-muted-foreground">
-              Preço
+              {isInformational
+                ? "Tipo"
+                : selectedIsPercent
+                  ? "Desconto"
+                  : options.length > 1
+                    ? selected?.label ?? "Preço"
+                    : "Preço"}
             </div>
-            <div className="text-xl font-bold text-primary">{formatBRL(product.price)}</div>
+            <div className="text-xl font-bold text-primary">
+              {selected ? renderValue(selected.value) : "—"}
+            </div>
           </div>
           <button
             onClick={handleAdd}
-            disabled={!isAvailable}
+            disabled={!canAdd}
             className={cn(
               "flex h-10 items-center gap-1.5 rounded-md px-3 text-sm font-bold uppercase tracking-wider transition-all",
-              isAvailable
+              canAdd
                 ? "bg-gradient-primary text-primary-foreground hover:shadow-glow active:scale-95"
                 : "bg-muted text-muted-foreground cursor-not-allowed",
             )}
           >
-            {added ? (
+            {isInformational ? (
+              <>
+                <Info className="h-4 w-4" />
+                Informativo
+              </>
+            ) : added ? (
               <>
                 <CheckCircle2 className="h-4 w-4" />
                 Adicionado
+              </>
+            ) : isCoupon ? (
+              <>
+                <Tag className="h-4 w-4" />
+                Aplicar
               </>
             ) : (
               <>

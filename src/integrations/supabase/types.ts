@@ -22,6 +22,7 @@ export type Database = {
           image_url: string | null
           name: string
           price: number
+          price_options: Json
           status: string
           updated_at: string
         }
@@ -32,6 +33,7 @@ export type Database = {
           image_url?: string | null
           name: string
           price?: number
+          price_options?: Json
           status?: string
           updated_at?: string
         }
@@ -42,6 +44,7 @@ export type Database = {
           image_url?: string | null
           name?: string
           price?: number
+          price_options?: Json
           status?: string
           updated_at?: string
         }

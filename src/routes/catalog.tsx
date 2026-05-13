@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
-import type { Product } from "@/lib/cart-context";
+import { classifyProduct, type Product } from "@/lib/cart-context";
 import { Crosshair, Search } from "lucide-react";
 
 export const Route = createFileRoute("/catalog")({
@@ -45,12 +45,17 @@ function CatalogPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return products;
-    return products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        (p.description ?? "").toLowerCase().includes(q),
-    );
+    const base = !q
+      ? products
+      : products.filter(
+          (p) =>
+            p.name.toLowerCase().includes(q) ||
+            (p.description ?? "").toLowerCase().includes(q),
+        );
+    // Pin informational (price 0) items to the top, then everything else alphabetical.
+    const informational = base.filter((p) => classifyProduct(p) === "informational");
+    const rest = base.filter((p) => classifyProduct(p) !== "informational");
+    return [...informational, ...rest];
   }, [products, query]);
 
   useEffect(() => {
