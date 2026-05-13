@@ -245,7 +245,8 @@ function CheckoutPage() {
                 <p className="text-sm leading-relaxed text-foreground">
                   <strong className="text-primary">Importante:</strong> Clique no botão abaixo
                   para enviar o seu pedido completo para a Orion Coldres e anexe o comprovativo
-                  do Pix na conversa para oficializar a sua compra.
+                  do Pix na conversa para agilizar a sua compra. Para pagamentos parcelados, 
+                  cartões ou pedidos em grupo, tratar direto no WhatsApp.
                 </p>
               </div>
 
