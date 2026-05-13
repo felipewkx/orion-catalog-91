@@ -390,6 +390,8 @@ function Dashboard({ email, onLogout }: { email: string; onLogout: () => void })
   );
 }
 
+type PriceOptionInput = { label: string; value: string };
+
 function ProductEditor({
   initial,
   onClose,
@@ -402,15 +404,34 @@ function ProductEditor({
   const isEdit = Boolean(initial.id);
   const [name, setName] = useState(initial.name ?? "");
   const [description, setDescription] = useState(initial.description ?? "");
-  const [price, setPrice] = useState<string>(
-    initial.price !== undefined ? String(initial.price) : "",
-  );
+  const initialOpts: PriceOptionInput[] = (() => {
+    const existing = (initial.price_options as PriceOptionInput[] | undefined) ?? [];
+    if (existing.length > 0) return existing.map((o) => ({ label: o.label, value: o.value }));
+    if (initial.price !== undefined) {
+      return [{ label: "Padrão", value: String(initial.price) }];
+    }
+    return [{ label: "Padrão", value: "" }];
+  })();
+  const [options, setOptions] = useState<PriceOptionInput[]>(initialOpts);
   const [status, setStatus] = useState<"available" | "sold_out">(
     initial.status ?? "available",
   );
   const [imageUrl, setImageUrl] = useState<string | null>(initial.image_url ?? null);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const updateOption = (idx: number, patch: Partial<PriceOptionInput>) =>
+    setOptions((prev) => prev.map((o, i) => (i === idx ? { ...o, ...patch } : o)));
+
+  const addOption = () => {
+    if (options.length >= 8) return;
+    setOptions((prev) => [...prev, { label: "", value: "" }]);
+  };
+
+  const removeOption = (idx: number) => {
+    if (options.length <= 1) return;
+    setOptions((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   const onFile = async (file: File) => {
     if (!file) return;
@@ -444,17 +465,44 @@ function ProductEditor({
       toast.error("Informe o nome.");
       return;
     }
-    const priceNum = parseFloat(price.replace(",", "."));
-    if (isNaN(priceNum) || priceNum < 0) {
-      toast.error("Preço inválido.");
-      return;
+
+    // Validate options
+    const cleaned: PriceOptionInput[] = [];
+    for (let i = 0; i < options.length; i++) {
+      const o = options[i];
+      const label = o.label.trim();
+      const rawValue = o.value.trim();
+      if (!label) {
+        toast.error(`Informe o rótulo da opção #${i + 1}.`);
+        return;
+      }
+      if (!rawValue) {
+        toast.error(`Informe o valor da opção #${i + 1}.`);
+        return;
+      }
+      const isPercent = /^\d+(\.\d+)?\s*%$/.test(rawValue.replace(",", "."));
+      if (isPercent) {
+        cleaned.push({ label, value: rawValue.replace(",", ".") });
+      } else {
+        const num = parseFloat(rawValue.replace(",", "."));
+        if (isNaN(num) || num < 0) {
+          toast.error(`Valor inválido na opção #${i + 1}.`);
+          return;
+        }
+        cleaned.push({ label, value: String(num) });
+      }
     }
+
+    // Primary numeric price (used as legacy fallback): first non-percent value, else 0.
+    const firstNumeric = cleaned.find((o) => !o.value.includes("%"));
+    const primaryPrice = firstNumeric ? parseFloat(firstNumeric.value) : 0;
 
     setSaving(true);
     const payload = {
       name: name.trim(),
       description: description.trim(),
-      price: priceNum,
+      price: primaryPrice,
+      price_options: cleaned,
       image_url: imageUrl,
       status,
     };
@@ -556,28 +604,67 @@ function ProductEditor({
             />
           </Field>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Preço (R$)">
-              <input
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                inputMode="decimal"
-                placeholder="0,00"
-                className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
-                required
-              />
-            </Field>
-            <Field label="Status">
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value as "available" | "sold_out")}
-                className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
+          {/* Price options */}
+          <div>
+            <div className="flex items-end justify-between gap-2">
+              <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                Variações de preço (1–8)
+              </label>
+              <button
+                type="button"
+                onClick={addOption}
+                disabled={options.length >= 8}
+                className="inline-flex items-center gap-1 rounded-md border border-border bg-secondary px-2 py-1 text-[11px] font-bold uppercase tracking-wider text-foreground hover:bg-accent disabled:opacity-40"
               >
-                <option value="available">Disponível</option>
-                <option value="sold_out">Esgotado</option>
-              </select>
-            </Field>
+                <Plus className="h-3 w-3" />
+                Adicionar
+              </button>
+            </div>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              Use um valor como <code>0</code> para item informativo, ou <code>15%</code> para
+              transformar em cupom de desconto.
+            </p>
+            <div className="mt-3 space-y-2">
+              {options.map((o, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <input
+                    placeholder="Rótulo (ex: Pequeno)"
+                    value={o.label}
+                    onChange={(e) => updateOption(i, { label: e.target.value })}
+                    maxLength={40}
+                    className="h-10 flex-1 rounded-md border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
+                  />
+                  <input
+                    placeholder="Valor (ex: 120,00 ou 15%)"
+                    value={o.value}
+                    onChange={(e) => updateOption(i, { value: e.target.value })}
+                    inputMode="text"
+                    className="h-10 flex-1 rounded-md border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeOption(i)}
+                    disabled={options.length <= 1}
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border text-muted-foreground hover:border-destructive hover:text-destructive disabled:opacity-40"
+                    aria-label="Remover opção"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
+
+          <Field label="Status">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as "available" | "sold_out")}
+              className="h-11 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none"
+            >
+              <option value="available">Disponível</option>
+              <option value="sold_out">Esgotado</option>
+            </select>
+          </Field>
 
           <div className="flex gap-3 pt-2">
             <button
