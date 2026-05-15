@@ -231,8 +231,16 @@ function Dashboard({ email, onLogout }: { email: string; onLogout: () => void })
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .order("created_at", { ascending: false });
-    if (!error && data) setProducts(data as unknown as Product[]);
+      .order("name", { ascending: true });
+    if (!error && data) {
+      const all = data as unknown as Product[];
+      // Display order: Recado (informational) → normal → Cupom.
+      const rank = (p: Product) => {
+        const k = classifyProduct(p);
+        return k === "informational" ? 0 : k === "coupon" ? 2 : 1;
+      };
+      setProducts([...all].sort((a, b) => rank(a) - rank(b)));
+    }
     setLoading(false);
   };
 
