@@ -264,6 +264,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         cashDiscountAmount,
         total,
         count,
+        applyCouponByCode,
       }}
     >
       {children}
