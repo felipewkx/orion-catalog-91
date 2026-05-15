@@ -176,7 +176,7 @@ function Index() {
             Fale com a gente
           </div>
           <h2 className="text-stencil mt-2 text-3xl font-bold text-foreground md:text-4xl">
-            Contato direto
+            CLIQUE PARA CONTATO DIRETO
           </h2>
         </div>
         <div className="mx-auto grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3">
