@@ -55,6 +55,7 @@ type CartContextType = {
   cashDiscountAmount: number;
   total: number;
   count: number;
+  applyCouponByCode: (code: string) => { ok: boolean; reason?: string };
 };
 
 const CartContext = createContext<CartContextType | null>(null);
