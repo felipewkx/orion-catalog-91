@@ -95,7 +95,7 @@ function CheckoutPage() {
 
     lines.push(
       ``,
-      `*TOTAL FINAL: ${formatBRL(total)}*`,
+      `*TOTAL FINAL: ${formatBRL(total)}* (+ frete a calcular)`,
       ``,
       `Olá, acabei de fazer este pedido no site e vou enviar o comprovativo do Pix abaixo.`,
     );
