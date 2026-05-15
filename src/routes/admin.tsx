@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Product } from "@/lib/cart-context";
-import { formatBRL } from "@/lib/cart-context";
+import { formatBRL, classifyProduct } from "@/lib/cart-context";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Mail, Lock, Plus, Pencil, Trash2, Upload, X, LogOut, Shield, Star, MessageSquare } from "lucide-react";
@@ -231,8 +231,16 @@ function Dashboard({ email, onLogout }: { email: string; onLogout: () => void })
     const { data, error } = await supabase
       .from("products")
       .select("*")
-      .order("created_at", { ascending: false });
-    if (!error && data) setProducts(data as unknown as Product[]);
+      .order("name", { ascending: true });
+    if (!error && data) {
+      const all = data as unknown as Product[];
+      // Display order: Recado (informational) → normal → Cupom.
+      const rank = (p: Product) => {
+        const k = classifyProduct(p);
+        return k === "informational" ? 0 : k === "coupon" ? 2 : 1;
+      };
+      setProducts([...all].sort((a, b) => rank(a) - rank(b)));
+    }
     setLoading(false);
   };
 

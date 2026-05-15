@@ -5,7 +5,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { ReviewsSection } from "@/components/reviews-section";
-import type { Product } from "@/lib/cart-context";
+import { classifyProduct, type Product } from "@/lib/cart-context";
+import { useIsAdmin } from "@/lib/use-is-admin";
 import heroImage from "@/assets/hero-tactical.jpg";
 import { Crosshair, Truck, ShieldCheck, Search, Instagram, Mail, MessageCircle } from "lucide-react";
 
@@ -20,6 +21,7 @@ const EMAIL_URL = "mailto:garlipp15@gmail.com";
 function Index() {
   const [query, setQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
     let mounted = true;
@@ -39,14 +41,17 @@ function Index() {
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
-    return products
+    const visibleSet = isAdmin
+      ? products
+      : products.filter((p) => classifyProduct(p) !== "coupon");
+    return visibleSet
       .filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
           (p.description ?? "").toLowerCase().includes(q),
       )
       .slice(0, 8);
-  }, [products, query]);
+  }, [products, query, isAdmin]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">

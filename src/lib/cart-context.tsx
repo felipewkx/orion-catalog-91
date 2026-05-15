@@ -1,4 +1,13 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+/** Normalize for accent/case/space-insensitive coupon matching. */
+export const normalizeCouponCode = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/\s+/g, "")
+    .toLowerCase();
 
 export type PriceOption = { label: string; value: string };
 
@@ -46,6 +55,7 @@ type CartContextType = {
   cashDiscountAmount: number;
   total: number;
   count: number;
+  applyCouponByCode: (code: string) => { ok: boolean; reason?: string };
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -107,6 +117,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [cashDiscount, setCashDiscountState] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [couponProducts, setCouponProducts] = useState<Product[]>([]);
+
+  // Pre-load all products and keep the ones flagged as "coupon" so the
+  // checkout can resolve typed coupon codes by product name without
+  // exposing them in the public catalog.
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data } = await supabase.from("products").select("*");
+      if (!mounted || !data) return;
+      const coupons = (data as unknown as Product[]).filter(
+        (p) => classifyProduct(p) === "coupon",
+      );
+      setCouponProducts(coupons);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -191,6 +220,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCashDiscountState(false);
   };
 
+  const applyCouponByCode: CartContextType["applyCouponByCode"] = (code) => {
+    const target = normalizeCouponCode(code);
+    if (!target) return { ok: false, reason: "Digite um código de cupom." };
+    const match = couponProducts.find(
+      (p) => normalizeCouponCode(p.name) === target,
+    );
+    if (!match) return { ok: false, reason: "Cupom inválido." };
+    const opts = getProductOptions(match);
+    const option = opts.find((o) => isPercentValue(o.value));
+    if (!option) return { ok: false, reason: "Cupom sem desconto configurado." };
+    return add({ product: match, option });
+  };
+
   const subtotal = items
     .filter((i) => !i.isCoupon)
     .reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
@@ -222,6 +264,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         cashDiscountAmount,
         total,
         count,
+        applyCouponByCode,
       }}
     >
       {children}

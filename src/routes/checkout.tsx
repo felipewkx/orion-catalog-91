@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   Tag,
   Wallet,
+  Truck,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -44,9 +45,11 @@ function CheckoutPage() {
     cashDiscountAmount,
     total,
     clear,
+    applyCouponByCode,
   } = useCart();
   const [copied, setCopied] = useState(false);
   const [name, setName] = useState("");
+  const [couponCode, setCouponCode] = useState("");
 
   const productLines = items.filter((i) => !i.isCoupon);
 
@@ -92,7 +95,7 @@ function CheckoutPage() {
 
     lines.push(
       ``,
-      `*TOTAL FINAL: ${formatBRL(total)}*`,
+      `*TOTAL FINAL: ${formatBRL(total)}* (+ frete a calcular)`,
       ``,
       `Olá, acabei de fazer este pedido no site e vou enviar o comprovativo do Pix abaixo.`,
     );
@@ -265,6 +268,58 @@ function CheckoutPage() {
                     <span className="font-bold text-foreground">Total</span>
                     <span className="text-2xl font-bold text-primary">{formatBRL(total)}</span>
                   </div>
+                  <div className="flex items-center justify-between rounded-md border border-dashed border-primary/40 bg-primary/5 px-3 py-2 text-xs">
+                    <span className="flex items-center gap-1.5 font-bold uppercase tracking-widest text-primary">
+                      <Truck className="h-3.5 w-3.5" />+ Frete
+                    </span>
+                    <span className="text-muted-foreground">
+                      Calculado após o pedido
+                    </span>
+                  </div>
+                </div>
+
+                {/* Coupon input */}
+                <div className="mt-4 rounded-md border border-border bg-secondary/30 p-3">
+                  <label
+                    htmlFor="coupon-input"
+                    className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground"
+                  >
+                    Cupom
+                  </label>
+                  <div className="mt-2 flex gap-2">
+                    <input
+                      id="coupon-input"
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      maxLength={60}
+                      disabled={Boolean(couponItem)}
+                      placeholder="Digite o código"
+                      className="h-10 flex-1 rounded-md border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none disabled:opacity-60"
+                    />
+                    <button
+                      type="button"
+                      disabled={Boolean(couponItem) || !couponCode.trim()}
+                      onClick={() => {
+                        const result = applyCouponByCode(couponCode);
+                        if (!result.ok) {
+                          toast.error(result.reason ?? "Cupom inválido.");
+                          return;
+                        }
+                        toast.success("Cupom aplicado!");
+                        setCouponCode("");
+                      }}
+                      className="inline-flex h-10 items-center gap-1.5 rounded-md bg-gradient-primary px-4 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-glow disabled:opacity-50"
+                    >
+                      <Tag className="h-3.5 w-3.5" />
+                      Aplicar
+                    </button>
+                  </div>
+                  {couponItem && (
+                    <p className="mt-2 text-xs text-primary">
+                      Cupom <strong>{couponItem.name}</strong> aplicado ({couponItem.discountPercent}%).
+                    </p>
+                  )}
                 </div>
 
                 {/* Cash payment toggle */}
