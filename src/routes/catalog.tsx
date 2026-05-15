@@ -27,6 +27,7 @@ function CatalogPage() {
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [visible, setVisible] = useState(PAGE_SIZE);
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
     let mounted = true;
