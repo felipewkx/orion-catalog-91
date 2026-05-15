@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Product } from "@/lib/cart-context";
-import { formatBRL } from "@/lib/cart-context";
+import { formatBRL, classifyProduct } from "@/lib/cart-context";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Mail, Lock, Plus, Pencil, Trash2, Upload, X, LogOut, Shield, Star, MessageSquare } from "lucide-react";
