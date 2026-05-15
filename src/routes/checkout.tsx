@@ -222,8 +222,11 @@ function CheckoutPage() {
                 </div>
               ))}
 
-              {couponItem && (
-                <div className="flex items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/10 p-4">
+              {couponItems.map((c) => (
+                <div
+                  key={c.lineId}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/10 p-4"
+                >
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/20 text-primary">
                       <Tag className="h-5 w-5" />
@@ -233,20 +236,19 @@ function CheckoutPage() {
                         Cupom aplicado
                       </div>
                       <div className="text-sm font-bold text-foreground">
-                        {couponItem.name} — {couponItem.selectedLabel} (
-                        {couponItem.discountPercent}%)
+                        {c.name} — {c.selectedLabel} ({c.discountPercent}%)
                       </div>
                     </div>
                   </div>
                   <button
-                    onClick={() => remove(couponItem.lineId)}
+                    onClick={() => remove(c.lineId)}
                     className="text-muted-foreground transition-colors hover:text-destructive"
                     aria-label="Remover cupom"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-              )}
+              ))}
 
               <button
                 onClick={clear}
