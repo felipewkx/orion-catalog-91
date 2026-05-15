@@ -49,14 +49,20 @@ type CartContextType = {
   updateQty: (lineId: string, qty: number) => void;
   clear: () => void;
   cashDiscount: boolean;
-  setCashDiscount: (v: boolean) => void;
+  setCashDiscount: (v: boolean) => { ok: boolean; reason?: string };
   subtotal: number; // sum of priced items
-  couponItem: CartItem | null;
+  couponItems: CartItem[];
+  couponItem: CartItem | null; // first coupon (back-compat)
   couponDiscountAmount: number;
   cashDiscountAmount: number;
+  freightAmount: number;
+  freightLabel: string;
   total: number;
   count: number;
   applyCouponByCode: (code: string) => { ok: boolean; reason?: string };
+  stackCouponCash: boolean;
+  stackCoupons: boolean;
+  cashDiscountPercent: number;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
