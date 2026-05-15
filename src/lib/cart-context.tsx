@@ -164,7 +164,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (hydrated) localStorage.setItem(CASH_KEY, cashDiscount ? "1" : "0");
   }, [cashDiscount, hydrated]);
 
-  const setCashDiscount = (v: boolean) => setCashDiscountState(v);
+  const settings = useSiteSettings();
+
+  const setCashDiscount: CartContextType["setCashDiscount"] = (v) => {
+    if (v && !settings.stack_coupon_cash && items.some((i) => i.isCoupon)) {
+      return {
+        ok: false,
+        reason:
+          "Cliente, escolha entre Usar Cupom ou por Desconto à vista.",
+      };
+    }
+    setCashDiscountState(v);
+    return { ok: true };
+  };
 
   const add: CartContextType["add"] = ({ product, option }) => {
     const kind = classifyProduct(product);
@@ -176,15 +188,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const discountPercent = isCoupon ? parsePercent(option.value) : 0;
     const unitPrice = isCoupon ? 0 : parseNumericValue(option.value);
 
-    if (isCoupon && items.some((i) => i.isCoupon)) {
-      return { ok: false, reason: "Apenas um cupom por pedido." };
+    if (isCoupon) {
+      // Block when cash+coupon stacking is disabled and cash is already on.
+      if (!settings.stack_coupon_cash && cashDiscount) {
+        return {
+          ok: false,
+          reason:
+            "Cliente, escolha entre Usar Cupom ou por Desconto à vista.",
+        };
+      }
+      // Block second coupon when coupon stacking is disabled.
+      if (!settings.stack_coupons && items.some((i) => i.isCoupon)) {
+        return { ok: false, reason: "Apenas um cupom por pedido." };
+      }
+      // Block exact same coupon twice even when stacking is on.
+      const lineId = `${product.id}::${option.label}`;
+      if (items.some((i) => i.lineId === lineId)) {
+        return { ok: false, reason: "Este cupom já foi aplicado." };
+      }
     }
 
     const lineId = `${product.id}::${option.label}`;
     setItems((prev) => {
       const existing = prev.find((i) => i.lineId === lineId);
       if (existing) {
-        // coupons can't be stacked
         if (isCoupon) return prev;
         return prev.map((i) =>
           i.lineId === lineId ? { ...i, quantity: i.quantity + 1 } : i,
@@ -244,14 +271,33 @@ export function CartProvider({ children }: { children: ReactNode }) {
     .filter((i) => !i.isCoupon)
     .reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
 
-  const couponItem = items.find((i) => i.isCoupon) ?? null;
-  const couponDiscountAmount = couponItem
-    ? subtotal * (couponItem.discountPercent / 100)
+  const couponItems = items.filter((i) => i.isCoupon);
+  const couponItem = couponItems[0] ?? null;
+
+  // When coupon stacking is off, only consider the first coupon line.
+  const activeCoupons = settings.stack_coupons ? couponItems : couponItems.slice(0, 1);
+  const couponPercentTotal = Math.min(
+    100,
+    activeCoupons.reduce((s, c) => s + c.discountPercent, 0),
+  );
+  const couponDiscountAmount = subtotal * (couponPercentTotal / 100);
+
+  const afterCoupon = Math.max(0, subtotal - couponDiscountAmount);
+
+  // Cash discount only applies when (a) toggle on, and (b) either stacking
+  // with coupon is allowed, or there are no coupons in the cart.
+  const cashApplies =
+    cashDiscount && (settings.stack_coupon_cash || activeCoupons.length === 0);
+  const cashDiscountAmount = cashApplies
+    ? afterCoupon * (settings.cash_discount_percent / 100)
     : 0;
 
-  const afterCoupon = subtotal - couponDiscountAmount;
-  const cashDiscountAmount = cashDiscount ? afterCoupon * 0.1 : 0;
-  const total = Math.max(0, afterCoupon - cashDiscountAmount);
+  const freightAmount =
+    settings.freight_mode === "fixed" ? Number(settings.freight_value) || 0 : 0;
+  const freightLabel =
+    settings.freight_mode === "fixed" ? formatBRL(freightAmount) : "a Combinar";
+
+  const total = Math.max(0, afterCoupon - cashDiscountAmount) + freightAmount;
 
   const count = items.reduce((sum, i) => sum + i.quantity, 0);
 
@@ -266,12 +312,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
         cashDiscount,
         setCashDiscount,
         subtotal,
+        couponItems,
         couponItem,
         couponDiscountAmount,
         cashDiscountAmount,
+        freightAmount,
+        freightLabel,
         total,
         count,
         applyCouponByCode,
+        stackCouponCash: settings.stack_coupon_cash,
+        stackCoupons: settings.stack_coupons,
+        cashDiscountPercent: settings.cash_discount_percent,
       }}
     >
       {children}
