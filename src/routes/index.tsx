@@ -19,6 +19,10 @@ function Index() {
   const [query, setQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const isAdmin = useIsAdmin();
+  const settings = useSiteSettings();
+  const INSTAGRAM_URL = settings.instagram_url;
+  const WHATSAPP_URL = `https://wa.me/${settings.whatsapp_number.replace(/\D/g, "")}`;
+  const EMAIL_URL = `mailto:${settings.email}`;
 
   useEffect(() => {
     let mounted = true;
