@@ -117,6 +117,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [cashDiscount, setCashDiscountState] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [couponProducts, setCouponProducts] = useState<Product[]>([]);
+
+  // Pre-load all products and keep the ones flagged as "coupon" so the
+  // checkout can resolve typed coupon codes by product name without
+  // exposing them in the public catalog.
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data } = await supabase.from("products").select("*");
+      if (!mounted || !data) return;
+      const coupons = (data as unknown as Product[]).filter(
+        (p) => classifyProduct(p) === "coupon",
+      );
+      setCouponProducts(coupons);
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     try {
