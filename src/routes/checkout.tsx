@@ -269,29 +269,33 @@ function CheckoutPage() {
                     </span>
                     <span>{formatBRL(subtotal)}</span>
                   </div>
-                  {couponItem && (
+                  {couponItems.length > 0 && (
                     <div className="flex justify-between text-primary">
-                      <span>Cupom ({couponItem.discountPercent}%)</span>
+                      <span>
+                        {couponItems.length === 1
+                          ? `Cupom (${couponItems[0].discountPercent}%)`
+                          : `Cupons (${couponItems.length})`}
+                      </span>
                       <span>-{formatBRL(couponDiscountAmount)}</span>
                     </div>
                   )}
-                  {cashDiscount && (
+                  {cashDiscountAmount > 0 && (
                     <div className="flex justify-between text-primary">
-                      <span>Desconto à vista (10%)</span>
+                      <span>Desconto à vista ({cashDiscountPercent}%)</span>
                       <span>-{formatBRL(cashDiscountAmount)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between border-t border-border pt-3 text-base">
-                    <span className="font-bold text-foreground">Total</span>
-                    <span className="text-2xl font-bold text-primary">{formatBRL(total)}</span>
-                  </div>
                   <div className="flex items-center justify-between rounded-md border border-dashed border-primary/40 bg-primary/5 px-3 py-2 text-xs">
                     <span className="flex items-center gap-1.5 font-bold uppercase tracking-widest text-primary">
                       <Truck className="h-3.5 w-3.5" />+ Frete
                     </span>
-                    <span className="text-muted-foreground">
-                      Calculado após o pedido
+                    <span className="font-semibold text-foreground">
+                      {freightLabel}
                     </span>
+                  </div>
+                  <div className="flex justify-between border-t border-border pt-3 text-base">
+                    <span className="font-bold text-foreground">Total</span>
+                    <span className="text-2xl font-bold text-primary">{formatBRL(total)}</span>
                   </div>
                 </div>
 
@@ -310,13 +314,12 @@ function CheckoutPage() {
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
                       maxLength={60}
-                      disabled={Boolean(couponItem)}
                       placeholder="Digite o código"
-                      className="h-10 flex-1 rounded-md border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none disabled:opacity-60"
+                      className="h-10 flex-1 rounded-md border border-input bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none"
                     />
                     <button
                       type="button"
-                      disabled={Boolean(couponItem) || !couponCode.trim()}
+                      disabled={!couponCode.trim()}
                       onClick={() => {
                         const result = applyCouponByCode(couponCode);
                         if (!result.ok) {
@@ -332,9 +335,14 @@ function CheckoutPage() {
                       Aplicar
                     </button>
                   </div>
-                  {couponItem && (
-                    <p className="mt-2 text-xs text-primary">
-                      Cupom <strong>{couponItem.name}</strong> aplicado ({couponItem.discountPercent}%).
+                  {!stackCoupons && (
+                    <p className="mt-2 text-[11px] text-muted-foreground">
+                      Apenas 1 cupom por pedido.
+                    </p>
+                  )}
+                  {stackCoupons && couponItems.length > 0 && (
+                    <p className="mt-2 text-[11px] text-primary">
+                      {couponItems.length} {couponItems.length === 1 ? "cupom" : "cupons"} aplicado(s).
                     </p>
                   )}
                 </div>
@@ -348,7 +356,10 @@ function CheckoutPage() {
                     id="cash-toggle"
                     type="checkbox"
                     checked={cashDiscount}
-                    onChange={(e) => setCashDiscount(e.target.checked)}
+                    onChange={(e) => {
+                      const r = setCashDiscount(e.target.checked);
+                      if (!r.ok && r.reason) toast.error(r.reason);
+                    }}
                     className="mt-0.5 h-4 w-4 accent-primary"
                   />
                   <div className="flex-1">
@@ -359,10 +370,16 @@ function CheckoutPage() {
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      Aplica 10% de desconto sobre o total final.
+                      Aplica {cashDiscountPercent}% de desconto sobre o total.
                     </p>
                   </div>
                 </label>
+
+                {!stackCouponCash && (
+                  <p className="mt-2 text-[11px] text-muted-foreground">
+                    Cliente, escolha entre Usar Cupom ou por Desconto à vista.
+                  </p>
+                )}
               </div>
 
               {/* Customer name */}
