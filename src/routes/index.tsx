@@ -9,19 +9,20 @@ import { classifyProduct, type Product } from "@/lib/cart-context";
 import { useIsAdmin } from "@/lib/use-is-admin";
 import heroImage from "@/assets/hero-tactical.jpg";
 import { Crosshair, Truck, ShieldCheck, Search, Instagram, Mail, MessageCircle } from "lucide-react";
+import { useSiteSettings } from "@/lib/use-site-settings";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const INSTAGRAM_URL = "https://www.instagram.com/orioncoldres/";
-const WHATSAPP_URL = "https://wa.me/5567981928456";
-const EMAIL_URL = "mailto:garlipp15@gmail.com";
-
 function Index() {
   const [query, setQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const isAdmin = useIsAdmin();
+  const settings = useSiteSettings();
+  const INSTAGRAM_URL = settings.instagram_url;
+  const WHATSAPP_URL = `https://wa.me/${settings.whatsapp_number.replace(/\D/g, "")}`;
+  const EMAIL_URL = `mailto:${settings.email}`;
 
   useEffect(() => {
     let mounted = true;
