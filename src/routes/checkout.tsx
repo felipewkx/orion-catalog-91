@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   Tag,
   Wallet,
+  Truck,
 } from "lucide-react";
 import { toast } from "sonner";
 
