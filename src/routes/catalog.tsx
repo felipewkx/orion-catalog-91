@@ -47,18 +47,22 @@ function CatalogPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const base = !q
+    // Hide coupon products from regular customers — only admins see them.
+    const visibleSet = isAdmin
       ? products
-      : products.filter(
+      : products.filter((p) => classifyProduct(p) !== "coupon");
+    const base = !q
+      ? visibleSet
+      : visibleSet.filter(
           (p) =>
             p.name.toLowerCase().includes(q) ||
             (p.description ?? "").toLowerCase().includes(q),
         );
-    // Pin informational (price 0) items to the top, then everything else alphabetical.
+    // Pin informational (Recado) items to the top.
     const informational = base.filter((p) => classifyProduct(p) === "informational");
     const rest = base.filter((p) => classifyProduct(p) !== "informational");
     return [...informational, ...rest];
-  }, [products, query]);
+  }, [products, query, isAdmin]);
 
   useEffect(() => {
     setVisible(PAGE_SIZE);
