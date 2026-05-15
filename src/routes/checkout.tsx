@@ -87,21 +87,30 @@ function CheckoutPage() {
       `*Subtotal:* ${formatBRL(subtotal)}`,
     ];
 
-    if (couponItem) {
-      lines.push(
-        `*Cupom aplicado:* ${couponItem.name} (${couponItem.selectedLabel} — ${couponItem.discountPercent}%)`,
-        `*Desconto cupom:* -${formatBRL(couponDiscountAmount)}`,
-      );
-    }
-
-    lines.push(`*Pagamento à vista (10% off):* ${cashDiscount ? "Sim" : "Não"}`);
-    if (cashDiscount) {
-      lines.push(`*Desconto à vista:* -${formatBRL(cashDiscountAmount)}`);
+    if (couponItems.length > 0) {
+      lines.push(`*Cupons aplicados:*`);
+      for (const c of couponItems) {
+        lines.push(
+          `• ${c.name} (${c.selectedLabel} — ${c.discountPercent}%)`,
+        );
+      }
+      lines.push(`*Desconto cupom:* -${formatBRL(couponDiscountAmount)}`);
     }
 
     lines.push(
+      `*Pagamento à vista (${cashDiscountPercent}% off):* ${cashDiscount ? "Sim" : "Não"}`,
+    );
+    if (cashDiscountAmount > 0) {
+      lines.push(`*Desconto à vista:* -${formatBRL(cashDiscountAmount)}`);
+    }
+
+    lines.push(`*Frete:* ${freightLabel}`);
+
+    lines.push(
       ``,
-      `*TOTAL FINAL: ${formatBRL(total)}* (+ frete a calcular)`,
+      `*TOTAL FINAL: ${formatBRL(total)}*${
+        freightAmount === 0 ? " (+ frete a calcular)" : ""
+      }`,
       ``,
       `Olá, acabei de fazer este pedido no site e vou enviar o comprovativo do Pix abaixo.`,
     );
