@@ -77,6 +77,51 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          cash_discount_percent: number
+          email: string
+          freight_mode: string
+          freight_value: number
+          id: string
+          instagram_url: string
+          pix_key: string
+          pix_name: string
+          stack_coupon_cash: boolean
+          stack_coupons: boolean
+          updated_at: string
+          whatsapp_number: string
+        }
+        Insert: {
+          cash_discount_percent?: number
+          email?: string
+          freight_mode?: string
+          freight_value?: number
+          id?: string
+          instagram_url?: string
+          pix_key?: string
+          pix_name?: string
+          stack_coupon_cash?: boolean
+          stack_coupons?: boolean
+          updated_at?: string
+          whatsapp_number?: string
+        }
+        Update: {
+          cash_discount_percent?: number
+          email?: string
+          freight_mode?: string
+          freight_value?: number
+          id?: string
+          instagram_url?: string
+          pix_key?: string
+          pix_name?: string
+          stack_coupon_cash?: boolean
+          stack_coupons?: boolean
+          updated_at?: string
+          whatsapp_number?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
