@@ -1,4 +1,13 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+/** Normalize for accent/case/space-insensitive coupon matching. */
+export const normalizeCouponCode = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/\s+/g, "")
+    .toLowerCase();
 
 export type PriceOption = { label: string; value: string };
 
