@@ -5,7 +5,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { ReviewsSection } from "@/components/reviews-section";
-import type { Product } from "@/lib/cart-context";
+import { classifyProduct, type Product } from "@/lib/cart-context";
+import { useIsAdmin } from "@/lib/use-is-admin";
 import heroImage from "@/assets/hero-tactical.jpg";
 import { Crosshair, Truck, ShieldCheck, Search, Instagram, Mail, MessageCircle } from "lucide-react";
 
