@@ -21,6 +21,7 @@ const EMAIL_URL = "mailto:garlipp15@gmail.com";
 function Index() {
   const [query, setQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
+  const isAdmin = useIsAdmin();
 
   useEffect(() => {
     let mounted = true;
