@@ -41,14 +41,17 @@ function Index() {
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
-    return products
+    const visibleSet = isAdmin
+      ? products
+      : products.filter((p) => classifyProduct(p) !== "coupon");
+    return visibleSet
       .filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
           (p.description ?? "").toLowerCase().includes(q),
       )
       .slice(0, 8);
-  }, [products, query]);
+  }, [products, query, isAdmin]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
