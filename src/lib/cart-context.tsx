@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useSiteSettings } from "@/lib/use-site-settings";
 
 /** Normalize for accent/case/space-insensitive coupon matching. */
 export const normalizeCouponCode = (s: string) =>
