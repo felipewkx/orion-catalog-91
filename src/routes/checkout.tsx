@@ -45,9 +45,11 @@ function CheckoutPage() {
     cashDiscountAmount,
     total,
     clear,
+    applyCouponByCode,
   } = useCart();
   const [copied, setCopied] = useState(false);
   const [name, setName] = useState("");
+  const [couponCode, setCouponCode] = useState("");
 
   const productLines = items.filter((i) => !i.isCoupon);
 
