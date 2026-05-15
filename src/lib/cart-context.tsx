@@ -220,6 +220,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCashDiscountState(false);
   };
 
+  const applyCouponByCode: CartContextType["applyCouponByCode"] = (code) => {
+    const target = normalizeCouponCode(code);
+    if (!target) return { ok: false, reason: "Digite um código de cupom." };
+    const match = couponProducts.find(
+      (p) => normalizeCouponCode(p.name) === target,
+    );
+    if (!match) return { ok: false, reason: "Cupom inválido." };
+    const opts = getProductOptions(match);
+    const option = opts.find((o) => isPercentValue(o.value));
+    if (!option) return { ok: false, reason: "Cupom sem desconto configurado." };
+    return add({ product: match, option });
+  };
+
   const subtotal = items
     .filter((i) => !i.isCoupon)
     .reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
