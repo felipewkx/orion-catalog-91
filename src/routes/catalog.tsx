@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ProductCard } from "@/components/product-card";
 import { classifyProduct, type Product } from "@/lib/cart-context";
+import { useIsAdmin } from "@/lib/use-is-admin";
 import { Crosshair, Search } from "lucide-react";
 
 export const Route = createFileRoute("/catalog")({
