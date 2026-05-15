@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useCart, formatBRL } from "@/lib/cart-context";
+import { useSiteSettings } from "@/lib/use-site-settings";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import {
@@ -18,10 +19,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-const PIX_KEY = "01238721117";
-const PIX_NAME = "Matheus Jacob Damas Garlipp";
-const WHATSAPP_NUMBER = "556781928456";
-
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
@@ -38,15 +35,24 @@ function CheckoutPage() {
     updateQty,
     remove,
     subtotal,
-    couponItem,
+    couponItems,
     couponDiscountAmount,
     cashDiscount,
     setCashDiscount,
     cashDiscountAmount,
+    cashDiscountPercent,
+    stackCouponCash,
+    stackCoupons,
+    freightAmount,
+    freightLabel,
     total,
     clear,
     applyCouponByCode,
   } = useCart();
+  const settings = useSiteSettings();
+  const PIX_KEY = settings.pix_key;
+  const PIX_NAME = settings.pix_name;
+  const WHATSAPP_NUMBER = settings.whatsapp_number.replace(/\D/g, "");
   const [copied, setCopied] = useState(false);
   const [name, setName] = useState("");
   const [couponCode, setCouponCode] = useState("");
