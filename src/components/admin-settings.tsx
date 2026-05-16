@@ -177,7 +177,7 @@ export function AdminSettings() {
               </p>
               {!s.stack_coupon_cash && (
                 <p className="mt-2 text-xs text-primary">
-                  Cliente, escolha entre Usar Cupom ou por Desconto à vista.
+                  Atenção: escolha entre Usar Cupom ou usar Desconto à vista.
                 </p>
               )}
             </div>
