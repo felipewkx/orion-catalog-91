@@ -170,7 +170,7 @@ export function AdminSettings() {
             />
             <div>
               <div className="text-sm font-bold text-foreground">
-                Frete e Cupom Cumulativos: {s.stack_coupon_cash ? "Ativado" : "Desativado"}
+                À Vista + Cupom = Cumulativos: {s.stack_coupon_cash ? "Ativado" : "Desativado"}
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
                 Quando desativado, o cliente escolhe entre Cupom OU Desconto à vista.
