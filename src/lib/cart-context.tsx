@@ -171,7 +171,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return {
         ok: false,
         reason:
-          "Cliente, escolha entre Usar Cupom ou por Desconto à vista.",
+          "Atenção: escolha entre Usar Cupom ou usar Desconto à vista.",
       };
     }
     setCashDiscountState(v);
