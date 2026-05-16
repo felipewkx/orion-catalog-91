@@ -170,8 +170,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (v && !settings.stack_coupon_cash && items.some((i) => i.isCoupon)) {
       return {
         ok: false,
-        reason:
-          "Cliente, escolha entre Usar Cupom ou por Desconto à vista.",
+        reason: "Não é possível acumular cupom com desconto à vista.",
       };
     }
     setCashDiscountState(v);
