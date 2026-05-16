@@ -287,7 +287,7 @@ function CheckoutPage() {
                   )}
                   <div className="flex items-center justify-between rounded-md border border-dashed border-primary/40 bg-primary/5 px-3 py-2 text-xs">
                     <span className="flex items-center gap-1.5 font-bold uppercase tracking-widest text-primary">
-                      <Truck className="h-3.5 w-3.5" />+ Frete
+                      <Truck className="h-3.5 w-3.5" />&nbsp;FRETE
                     </span>
                     <span className="font-semibold text-foreground">
                       {freightLabel}
