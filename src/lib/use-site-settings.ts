@@ -58,8 +58,10 @@ export function useSiteSettings(): SiteSettings {
     };
     load();
 
-    const channel = supabase
-      .channel("site_settings_changes")
+    const channel = supabase.channel(
+      `site_settings_changes_${Math.random().toString(36).slice(2)}`,
+    );
+    channel
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "site_settings" },

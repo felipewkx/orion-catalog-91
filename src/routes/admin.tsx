@@ -5,6 +5,7 @@ import type { Product } from "@/lib/cart-context";
 import { formatBRL, classifyProduct } from "@/lib/cart-context";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { AdminSettings } from "@/components/admin-settings";
 import { Mail, Lock, Plus, Pencil, Trash2, Upload, X, LogOut, Shield, Star, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -380,6 +381,8 @@ function Dashboard({ email, onLogout }: { email: string; onLogout: () => void })
         )}
 
         <AdminReviews />
+
+        <AdminSettings />
       </main>
 
       {editing && (
