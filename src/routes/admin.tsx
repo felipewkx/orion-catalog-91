@@ -380,6 +380,8 @@ function Dashboard({ email, onLogout }: { email: string; onLogout: () => void })
         )}
 
         <AdminReviews />
+
+        <AdminSettings />
       </main>
 
       {editing && (
