@@ -376,8 +376,8 @@ function CheckoutPage() {
                 </label>
 
                 {!stackCouponCash && (
-                  <p className="mt-2 text-[11px] text-muted-foreground">
-                    Cliente, escolha entre Usar Cupom ou por Desconto à vista.
+                  <p className="mt-2 text-[11px] text-muted-foreground text-center">
+                    (Cálculo de frete sob demanda)
                   </p>
                 )}
               </div>
