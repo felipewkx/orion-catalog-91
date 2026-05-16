@@ -377,7 +377,7 @@ function CheckoutPage() {
 
                 {!stackCouponCash && (
                   <p className="mt-2 text-[11px] text-muted-foreground">
-                    Cliente, escolha entre Usar Cupom ou por Desconto à vista.
+                    Atenção: escolha entre Usar Cupom ou usar Desconto à vista.
                   </p>
                 )}
               </div>
