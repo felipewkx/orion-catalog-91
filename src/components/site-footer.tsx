@@ -8,7 +8,7 @@ export function SiteFooter() {
         <div className="flex items-center gap-2">
           <Shield className="h-4 w-4 text-primary" />
           <span className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Orion Coldres — Equipamento tático profissional.
+            © {new Date().getFullYear()} Orion Coldres — Website produzido por Felipe Walker.
           </span>
         </div>
         <Link
