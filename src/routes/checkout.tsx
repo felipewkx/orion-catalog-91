@@ -375,9 +375,11 @@ function CheckoutPage() {
                   </div>
                 </label>
 
-                <p className="mt-4 text-[11px] text-muted-foreground text-center italic border-t border-border pt-4">
-                  (Cálculo de frete sob demanda)
-                </p>
+                {!stackCouponCash && (
+                  <p className="mt-2 text-[11px] text-muted-foreground">
+                    Cliente, escolha entre Usar Cupom ou por Desconto à vista.
+                  </p>
+                )}
               </div>
 
               {/* Customer name */}

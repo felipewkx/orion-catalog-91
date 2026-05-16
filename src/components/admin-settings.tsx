@@ -177,7 +177,7 @@ export function AdminSettings() {
               </p>
               {!s.stack_coupon_cash && (
                 <p className="mt-2 text-xs text-primary">
-                  (Cálculo de frete sob demanda)
+                  Cliente, escolha entre Usar Cupom ou por Desconto à vista.
                 </p>
               )}
             </div>
