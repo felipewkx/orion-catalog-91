@@ -192,8 +192,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (!settings.stack_coupon_cash && cashDiscount) {
         return {
           ok: false,
-          reason:
-            "Cliente, escolha entre Usar Cupom ou por Desconto à vista.",
+          reason: "Não é possível acumular cupom com desconto à vista.",
         };
       }
       // Block second coupon when coupon stacking is disabled.
