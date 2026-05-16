@@ -173,7 +173,7 @@ export function AdminSettings() {
                 À Vista + Cupom = Cumulativos: {s.stack_coupon_cash ? "Ativado" : "Desativado"}
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                Quando desativado, o cliente escolhe entre Cupom OU Desconto à vista.
+                Quando desativado, o cliente escolhe entre Cupom OU Desconto à vista, e vê a seguinte mensagem:
               </p>
               {!s.stack_coupon_cash && (
                 <p className="mt-2 text-xs text-primary">
